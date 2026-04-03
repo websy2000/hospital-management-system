@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Appointment Updated</title>
+    <style>
+        body { font-family: sans-serif; margin: 40px; color: #333; }
+        .container { max-width: 600px; margin: auto; border: 1px solid #eee; padding: 20px; }
+        .details { background-color: #f9f9f9; padding: 15px; border-radius: 5px; }
+        .cancelled { color: #d32f2f; }
+        .rescheduled { color: #f57c00; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        {% if update_type == 'rescheduled' %}
+            <h1 class="rescheduled">Appointment Rescheduled</h1>
+            <p>Dear {{ patient.name }},</p>
+            <p>This is to inform you that your appointment has been rescheduled. Your new appointment details are below.</p>
+        {% elif update_type == 'cancelled' %}
+            <h1 class="cancelled">Appointment Cancelled</h1>
+            <p>Dear {{ patient.name }},</p>
+            <p>This is to confirm that your appointment has been cancelled.</p>
+        {% endif %}
+
+        <div class="details">
+            <h3>Appointment Details:</h3>
+            <ul>
+                <li><strong>Doctor:</strong> Dr. {{ appointment.doctor.user.name }}</li>
+                <li>
+                    <strong>Date & Time:</strong>
+                    <span style="{{ 'text-decoration: line-through;' if update_type == 'cancelled' else '' }}">
+                        {{ appointment.appointment_date.strftime('%A, %B %d, %Y at %I:%M %p') }}
+                    </span>
+                    {% if update_type == 'rescheduled' %}
+                       <strong> (New Date)</strong>
+                    {% endif %}
+                </li>
+                {% if update_type == 'cancelled' and reason %}
+                <li><strong>Reason for Cancellation:</strong> {{ reason }}</li>
+                {% endif %}
+            </ul>
+        </div>
+        
+        <p>If you have any questions, please contact our support.</p>
+        <br>
+        <p>Best regards,</p>
+        <p>The Hospital Management Team</p>
+    </div>
+</body>
+</html>

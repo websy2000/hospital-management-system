@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Welcome!</title>
+    <style>
+        body { font-family: sans-serif; margin: 40px; color: #333; }
+        .container { max-width: 600px; margin: auto; border: 1px solid #eee; padding: 20px; }
+        h1 { color: #444; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Welcome, {{ user.name }}!</h1>
+        <p>Thank you for registering at the <strong>Hospital Management System</strong>.</p>
+        <p>Your account has been created with the role: <strong>{{ user.role }}</strong>.</p>
+        <p>You can now log in to your dashboard and manage your appointments and records.</p>
+        <br>
+        <p>Best regards,</p>
+        <p>The Hospital Management Team</p>
+    </div>
+</body>
+</html>
