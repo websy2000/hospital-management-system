@@ -32,7 +32,7 @@ if not app.config.get('MAIL_SERVER'):
 mail = Mail(app)
 # More specific CORS configuration for development
 CORS(app, resources={r"/api/*": {
-    "origins": "*",  # In production, you should restrict this to your frontend's domain
+    "origins": os.environ.get('FRONTEND_URL', 'http://localhost:3000'),  # Restrict to your frontend's production domain
     "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     "allow_headers": ["Authorization", "Content-Type"]
 }})
@@ -1149,4 +1149,5 @@ if __name__ == '__main__':
     with app.app_context():
         db.create_all()
         seed_database()
-    app.run(debug=True, port=5000)
+    # Listen on all network interfaces in debug mode for mobile testing
+    app.run(debug=True, port=5000, host='0.0.0.0')
