@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { doctorService, feedbackService } from "../services/api";
+import { doctorService } from "../services/api";
 import "./Dashboard.css";
 
 function DoctorProfile() {
@@ -10,11 +10,7 @@ function DoctorProfile() {
   const [feedback, setFeedback] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    loadDoctorProfile();
-  }, [id]);
-
-  const loadDoctorProfile = async () => {
+  const loadDoctorProfile = useCallback(async () => {
     setLoading(true);
     try {
       const res = await doctorService.getProfile(id);
@@ -25,7 +21,11 @@ function DoctorProfile() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [id]);
+
+  useEffect(() => {
+    loadDoctorProfile();
+  }, [loadDoctorProfile]);
 
   if (loading)
     return (

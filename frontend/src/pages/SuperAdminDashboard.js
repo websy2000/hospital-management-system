@@ -205,16 +205,7 @@ function SuperAdminDashboard({ user, onLogout }) {
   const [message, setMessage] = useState({ text: "", type: "" });
   const { theme, toggleTheme } = useTheme();
 
-  useEffect(() => {
-    loadData();
-  }, [activeTab]);
-
-  const showMsg = (text, type = "success") => {
-    setMessage({ text, type });
-    setTimeout(() => setMessage({ text: "", type: "" }), 4000);
-  };
-
-  const loadData = async () => {
+  const loadData = React.useCallback(async () => {
     setLoading(true);
     try {
       switch (activeTab) {
@@ -251,6 +242,15 @@ function SuperAdminDashboard({ user, onLogout }) {
     } finally {
       setLoading(false);
     }
+  }, [activeTab]);
+
+  useEffect(() => {
+    loadData();
+  }, [loadData]);
+
+  const showMsg = (text, type = "success") => {
+    setMessage({ text, type });
+    setTimeout(() => setMessage({ text: "", type: "" }), 4000);
   };
 
   // ── Submit add / edit ──────────────────────────────────────────────────────

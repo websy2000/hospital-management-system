@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useTheme } from "./ThemeContext";
 import DataTable from "./DataTable";
 import {
@@ -13,7 +13,6 @@ import {
   FaCalendarCheck,
   FaUserInjured,
   FaPrescriptionBottleAlt,
-  FaStickyNote,
   FaCheck,
   FaTimes,
   FaEdit,
@@ -53,16 +52,12 @@ function DoctorDashboard({ user, onLogout }) {
   const [message, setMessage] = useState({ text: "", type: "" });
   const { theme, toggleTheme } = useTheme();
 
-  useEffect(() => {
-    loadData();
-  }, [activeTab]);
-
   const showMsg = (text, type = "success") => {
     setMessage({ text, type });
     setTimeout(() => setMessage({ text: "", type: "" }), 4000);
   };
 
-  const loadData = async () => {
+  const loadData = useCallback(async () => {
     setLoading(true);
     try {
       if (activeTab === "appointments") {
@@ -77,7 +72,11 @@ function DoctorDashboard({ user, onLogout }) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [activeTab]);
+
+  useEffect(() => {
+    loadData();
+  }, [loadData]);
 
   // ── Open inline edit ───────────────────────────────────────────────────────
   const startEdit = (apt) => {

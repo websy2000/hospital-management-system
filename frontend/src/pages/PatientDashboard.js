@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useTheme } from "./ThemeContext";
 import { useNavigate } from "react-router-dom";
 import {
@@ -131,7 +131,6 @@ function PatientDashboard({ user, onLogout }) {
   const [prescriptions, setPrescriptions] = useState([]);
   const [medicalHistory, setMedicalHistory] = useState([]);
   const [doctors, setDoctors] = useState([]);
-  const [printApt, setPrintApt] = useState(null);
 
   // Booking and payment flow state managed by a reducer
   const [bookingState, dispatch] = React.useReducer(
@@ -149,35 +148,12 @@ function PatientDashboard({ user, onLogout }) {
   const [message, setMessage] = useState({ text: "", type: "" });
   const { theme, toggleTheme } = useTheme();
 
-  useEffect(() => {
-    loadData();
-  }, [activeTab]);
-
-  // Ensure doctors are loaded when opening the booking modal
-  useEffect(() => {
-    const fetchDoctorsIfNeeded = async () => {
-      if (bookingState.showBooking && (!doctors || doctors.length === 0)) {
-        setLoading(true);
-        try {
-          const res = await doctorService.getDoctors();
-          setDoctors(res.data);
-        } catch (err) {
-          console.error(err);
-          showMsg("Failed to load doctors list.", "error");
-        } finally {
-          setLoading(false);
-        }
-      }
-    };
-    fetchDoctorsIfNeeded();
-  }, [bookingState.showBooking]);
-
-  const showMsg = (text, type = "success") => {
+  const showMsg = useCallback((text, type = "success") => {
     setMessage({ text, type });
     setTimeout(() => setMessage({ text: "", type: "" }), 5000);
-  };
+  }, []);
 
-  const loadData = async () => {
+  const loadData = useCallback(async () => {
     setLoading(true);
     try {
       if (activeTab === "appointments") {
@@ -202,7 +178,30 @@ function PatientDashboard({ user, onLogout }) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [activeTab]);
+
+  useEffect(() => {
+    loadData();
+  }, [loadData]);
+
+  // Ensure doctors are loaded when opening the booking modal
+  useEffect(() => {
+    const fetchDoctorsIfNeeded = async () => {
+      if (bookingState.showBooking && (!doctors || doctors.length === 0)) {
+        setLoading(true);
+        try {
+          const res = await doctorService.getDoctors();
+          setDoctors(res.data);
+        } catch (err) {
+          console.error(err);
+          showMsg("Failed to load doctors list.", "error");
+        } finally {
+          setLoading(false);
+        }
+      }
+    };
+    fetchDoctorsIfNeeded();
+  }, [bookingState.showBooking, doctors, showMsg]);
 
   // ── Step 1: Submit booking form ────────────────────────────────────────────
   const handleBookingSubmit = async (e) => {
